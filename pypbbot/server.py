@@ -44,7 +44,7 @@ async def close() -> None:
     logger.info('Shutting down. Have a nice day!')
 
 
-@ app.websocket("/ws/")
+@ app.websocket("/pbbot")
 async def handle_websocket(websocket: WebSocket) -> None:
     await websocket.accept()
     botId = int(websocket.headers.get("x-self-id"))
