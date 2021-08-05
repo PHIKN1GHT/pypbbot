@@ -47,29 +47,28 @@ async def close() -> None:
 @ app.websocket("/ws/")
 async def handle_websocket(websocket: WebSocket) -> None:
     await websocket.accept()
-    logger.info('Accepted client from {}:{}'.format(
-        websocket.client.host, websocket.client.port))
+    botId = int(websocket.headers.get("x-self-id"))
+    logger.info('Accepted client [{}] from [{}:{}]'.format(
+        botId, websocket.client.host, websocket.client.port))
     client_addr = "{}:{}".format(
         websocket.client.host, websocket.client.port)
-    alive_clients[client_addr] = -1
+
+    if not botId in drivers.keys():
+        alive_clients[client_addr] = botId
+        driver_builder = app.driver_builder
+        if driver_builder is None:
+            driver_builder = BaseDriver
+        drivers[botId] = (websocket, driver_builder(botId))
+    else:
+        _, dri = drivers[botId]
+        drivers[botId] = (websocket, dri)
 
     while True:
         try:
             rawdata: bytes = await websocket.receive_bytes()
             frame = Frame()
             frame.ParseFromString(rawdata)
-
-            if not frame.botId in drivers.keys():
-
-                alive_clients[client_addr] = frame.botId
-                driver_builder = app.driver_builder
-                if driver_builder is None:
-                    driver_builder = BaseDriver
-                drivers[frame.botId] = (websocket, driver_builder(frame.botId))
-            else:
-                _, dri = drivers[frame.botId]
-                drivers[frame.botId] = (websocket, dri)
-            await recv_frame(frame, frame.botId)
+            await recv_frame(frame, botId)
         except WebSocketDisconnect:
             client_addr = "{}:{}".format(
                 websocket.client.host, websocket.client.port)
@@ -77,7 +76,7 @@ async def handle_websocket(websocket: WebSocket) -> None:
             if alive_clients[client_addr] != -1:
                 client_id = alive_clients[client_addr]
                 del drivers[client_id]
-            logger.warning('Connection to {} has been closed, lost connection with [{}] '.format(
+            logger.warning('Connection to [{}] has been closed, lost connection with [{}] '.format(
                 client_addr, client_id))
             break
 
