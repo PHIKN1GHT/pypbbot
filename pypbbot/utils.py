@@ -1,8 +1,9 @@
 from __future__ import annotations
-import asyncio
-from functools import wraps, partial
 
+import asyncio
 import typing
+from functools import partial, wraps
+
 if typing.TYPE_CHECKING:
     from typing import Tuple, Dict, Union, Type, List, Optional, Iterator, Dict, Callable, Any
     from pypbbot.typing import ProtobufBotAPI
@@ -10,13 +11,14 @@ if typing.TYPE_CHECKING:
 
 import copy
 import threading
-from typing import Coroutine, TypeVar, Mapping
-
-from collections import OrderedDict
 from asyncio import Lock, get_event_loop
-from pypbbot.typing import ProtobufBotMessage as Message
+from collections import OrderedDict
+from typing import Coroutine, Mapping, TypeVar
+
 import pypbbot.server
-from pypbbot.protocol import SendPrivateMsgReq, SendGroupMsgReq, PrivateMessageEvent, GroupMessageEvent
+from pypbbot.protocol import (GroupMessageEvent, PrivateMessageEvent,
+                              SendGroupMsgReq, SendPrivateMsgReq)
+from pypbbot.typing import ProtobufBotMessage as Message
 
 
 def in_lower_case(text: str) -> str:
@@ -166,3 +168,13 @@ def asyncify(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
         pfunc = partial(func, *args, **kwargs)
         return await loop.run_in_executor(executor, pfunc)
     return run
+
+
+def find_free_port() -> int:
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("", 0))
+    s.listen(1)
+    port = s.getsockname()[1]
+    s.close()
+    return int(port)

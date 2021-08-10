@@ -1,21 +1,29 @@
 from __future__ import annotations
+
 import typing
+
+import psutil  # type: ignore
 
 if typing.TYPE_CHECKING:
     from asyncio import Future
     from typing import Tuple, Optional, Type, Union
     from pypbbot.driver import Drivable
     from pypbbot.typing import ProtobufBotAPI
+
 import asyncio
+import os
+import threading
+import time
 import uuid
+
 import uvicorn  # type: ignore
 from fastapi import FastAPI, WebSocket
-from pypbbot.driver import BaseDriver
-from pypbbot.utils import in_lower_case, LRULimitedDict
-from pypbbot.typing import ProtobufBotFrame as Frame
-from pypbbot.logging import logger, LOG_CONFIG
-
 from starlette.websockets import WebSocketDisconnect
+
+from pypbbot.driver import BaseDriver
+from pypbbot.logging import LOG_CONFIG, logger
+from pypbbot.typing import ProtobufBotFrame as Frame
+from pypbbot.utils import LRULimitedDict, in_lower_case
 
 
 class PyPbBotApp(FastAPI):
@@ -42,6 +50,19 @@ async def init() -> None:
 @ app.on_event("shutdown")
 async def close() -> None:
     logger.info('Shutting down. Have a nice day!')
+
+
+@ app.websocket("/shutdown")
+async def handle_shutdown(websocket: WebSocket) -> None:
+    await websocket.accept()
+    logger.warning("Being asked to shutdown by websocket trigger.")
+
+    def self_terminate() -> None:
+        asyncio.run(close())
+        time.sleep(1)
+        parent = psutil.Process(psutil.Process(os.getpid()).ppid())
+        parent.kill()
+    threading.Thread(target=self_terminate, daemon=True).start()
 
 
 @ app.websocket("/pbbot")
