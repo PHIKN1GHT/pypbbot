@@ -48,7 +48,7 @@ class Clips():
         if isinstance(other, Clips):
             clips._data += copy.deepcopy(other._data)
         elif isinstance(other, str) or isinstance(other, int) or isinstance(other, float):
-            clips._data += Clips.from_str(str(other))._data
+            clips._data += Clips.fromStr(str(other))._data
         return clips
 
     def __radd__(self: T, other: Union[T, str, int, float]) -> T:
@@ -56,7 +56,7 @@ class Clips():
         if isinstance(other, Clips):
             clips._data = copy.deepcopy(other._data) + clips._data
         else:
-            clips._data = Clips.from_str(str(other))._data + clips._data
+            clips._data = Clips.fromStr(str(other))._data + clips._data
         return clips
 
     def __str__(self: T) -> str:
@@ -77,7 +77,7 @@ class Clips():
         return lst
 
     @classmethod
-    def from_str(cls: Type[T], text: str) -> T:
+    def fromStr(cls: Type[T], text: str) -> T:
         return cls().append(("text", {"text": text}))
 
     @classmethod
@@ -91,7 +91,7 @@ class Clips():
         return clips
 
     @classmethod
-    def from_image_url(cls: Type[T], url: str) -> T:
+    def fromImageURL(cls: Type[T], url: str) -> T:
         return cls().append(("image", {"url": url}))
 
 

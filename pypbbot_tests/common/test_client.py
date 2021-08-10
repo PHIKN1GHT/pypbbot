@@ -24,5 +24,5 @@ async def test_start_test_server():
         client = await TestClient(tserver).connect()
         somerandomwords = ''.join(random.choices(
             string.ascii_letters + string.digits, k=32))
-        await client.recvPrivateMessage(Clips.from_str("#echo " + somerandomwords))
+        await client.recvPrivateMessage(Clips.fromStr("#echo " + somerandomwords))
         assert str(await client.expectPrivateReply()) == somerandomwords
