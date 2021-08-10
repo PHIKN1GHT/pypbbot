@@ -1,1 +1,1 @@
-# HINT: pytest -x pypbbot_tests
+# HINT: pytest -s pypbbot_tests
