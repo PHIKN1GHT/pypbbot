@@ -4,6 +4,8 @@ import asyncio
 import typing
 from functools import partial, wraps
 
+from google.protobuf.internal.containers import BaseContainer  # For type anno
+
 if typing.TYPE_CHECKING:
     from typing import Tuple, Dict, Union, Type, List, Optional, Iterator, Dict, Callable, Any
     from pypbbot.typing import ProtobufBotAPI
@@ -11,7 +13,7 @@ if typing.TYPE_CHECKING:
 
 import copy
 import threading
-from asyncio import Lock, get_event_loop
+from asyncio import get_event_loop
 from collections import OrderedDict
 from typing import Coroutine, Mapping, TypeVar
 
@@ -77,6 +79,16 @@ class Clips():
     @classmethod
     def from_str(cls: Type[T], text: str) -> T:
         return cls().append(("text", {"text": text}))
+
+    @classmethod
+    def fromMessageList(cls: Type[T], msgList: BaseContainer[Message]) -> T:
+        clips = cls()
+        for msg in msgList:
+            datum = {}
+            for item in msg.data:
+                datum[item] = msg.data[item]
+            clips._data.append((msg.type, datum))
+        return clips
 
     @classmethod
     def from_image_url(cls: Type[T], url: str) -> T:
