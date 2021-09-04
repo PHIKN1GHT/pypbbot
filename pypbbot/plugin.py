@@ -89,7 +89,12 @@ async def load_plugins(*plugin_dir: str) -> Dict[str, ModuleType]:
                 for module_name in module_names:
                     logger.info('Loading module [{}] from [{}] ...'.format(
                         module_name, name))
-                    _loadedPlugins[name] = importlib.import_module(module_name)
+                    try:
+                        _loadedPlugins[name] = importlib.import_module(
+                            module_name)
+                    except:
+                        logger.warning('Failed to load [{}]. Possibly illegal module type.'.format(
+                            module_name))
 
     for module_finder, name, _ in pkgutil.iter_modules(plugin_dir):
         logger.info('Loading module [{}] ...'.format(name))
