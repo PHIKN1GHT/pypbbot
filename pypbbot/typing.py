@@ -27,3 +27,5 @@ ProtobufBotMessageEvent = Union[onebot_event_pb2.PrivateMessageEvent,
 
 
 Event = Union[ProtobufBotEvent]
+__all__ = ["Event", "ProtobufBotMessageEvent",
+           "PrivateMessageEvent", "GroupMessageEvent"]

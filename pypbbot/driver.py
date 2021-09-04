@@ -1,17 +1,21 @@
 from __future__ import annotations
 
 import typing
-if typing.TYPE_CHECKING:
-    from typing import Type, Dict, Optional
-    from pypbbot.typing import ProtobufBotAPI
 
-from typing import Callable, Union, Any
-from pypbbot.protocol import *
-from pypbbot import server
-from pypbbot.utils import Clips, sendBackClipsTo
-from pypbbot.protocol import PrivateMessageEvent, GroupMessageEvent
-from pypbbot.typing import ProtobufBotEvent
+from pypbbot.plugin import _handlers
+
+if typing.TYPE_CHECKING:
+    from typing import Type, Dict, Optional, Tuple
+    from pypbbot.typing import ProtobufBotAPI, Event, PrivateMessageEvent, GroupMessageEvent, ProtobufBotEvent
+
 import inspect
+from typing import Any, Callable, Union
+
+from pypbbot import server
+from pypbbot.affairs import BaseAffair, ChatAffair
+from pypbbot.logging import logger
+from pypbbot.protocol import *
+from pypbbot.utils import Clips, SingletonType, sendBackClipsTo
 
 
 class BaseDriver:
@@ -112,3 +116,23 @@ class BaseDriver:
 
 
 Drivable = BaseDriver
+
+
+class AffairDriver(BaseDriver, metaclass=SingletonType):
+    def __init__(self) -> None:
+        pass
+
+    def __new__(cls, *args: Tuple[Any], **kwargs: Dict[str, Any]) -> Any:
+        return object.__new__(cls)
+
+    async def handle(self, event: Event) -> None:
+        affair: BaseAffair
+        if isinstance(event, PrivateMessageEvent) or isinstance(event, GroupMessageEvent):
+            affair = ChatAffair(event)
+        else:
+            affair = BaseAffair(event)
+        logger.warning('Handling [{}]'.format(affair))
+        for handler in _handlers.queue:
+            affair_filter = handler._ftr
+            if affair_filter(affair):
+                await handler._func(affair)
