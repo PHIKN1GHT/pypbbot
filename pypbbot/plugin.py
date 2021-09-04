@@ -1,4 +1,8 @@
 from __future__ import annotations
+import importlib
+import zipfile
+import zipimport
+import sys
 
 import inspect
 import os
@@ -70,6 +74,23 @@ async def load_plugins(*plugin_dir: str) -> Dict[str, ModuleType]:
         if not os.path.exists(_dir):
             os.makedirs(_dir)
 
+        for name in os.listdir(_dir):
+            if name.endswith(".zip"):
+                zippath = os.path.join(_dir, name)
+                sys.path.append(zippath)
+                module_names: set[str] = set()
+                with zipfile.ZipFile(zippath) as zipmodule:
+                    for filename in zipmodule.namelist():
+                        module_name = filename
+                        _pathsep = filename.find("/")
+                        if _pathsep != -1:
+                            module_name = filename[:_pathsep]
+                        module_names.add(module_name)
+                for module_name in module_names:
+                    logger.info('Loading module [{}] from [{}] ...'.format(
+                        module_name, name))
+                    _loadedPlugins[name] = importlib.import_module(module_name)
+
     for module_finder, name, _ in pkgutil.iter_modules(plugin_dir):
         logger.info('Loading module [{}] ...'.format(name))
         if isinstance(module_finder, PathEntryFinder):  # Hack for Type Check
@@ -78,6 +99,7 @@ async def load_plugins(*plugin_dir: str) -> Dict[str, ModuleType]:
             module = module_finder.find_module(name, None)  # SourceFileLoader
         if module is not None:
             _loadedPlugins[name] = module.load_module(name)
+
     return _loadedPlugins
 
 _handlers: PriorityQueue[CallableHandler] = PriorityQueue()
