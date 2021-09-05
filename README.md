@@ -9,8 +9,12 @@ Pypbbot：一个高效、跨平台、可扩展的<a href="https://github.com/PHI
 <a href="https://pypbbot.kale1d0.space/"><b>文档主页</b></a><br/>
 注意，本项目仍处于<b>早期开发阶段</b>，暂不适合用于生产环境。
 </div>
-
-当前版本：0.4a6
+<br/>
+<p align="center">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg" />
+  <img alt="Version" src="https://img.shields.io/pypi/v/pypbbot.svg" />
+  <img alt="Downloads" src="https://img.shields.io/pypi/dm/pypbbot" />
+</p>
 
 # 如何使用
 
