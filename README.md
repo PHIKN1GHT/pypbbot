@@ -22,10 +22,10 @@ Pypbbot：一个高效、跨平台、可扩展的<a href="https://github.com/PHI
 
 ## 普通用户
 
-在工作目录内（一般是`plugins`文件夹所在的目录）执行`pypbbot`即可启动插件服务器。
+在工作目录内（一般是`plugins`文件夹所在的目录）执行`pypbbot run`即可启动插件服务器。
 
 ```cmd
-使用方法: pypbbot [选项]
+使用方法: pypbbot run [选项]
 
 选项列表:
   --host TEXT             服务器地址  [默认值: localhost]
@@ -48,7 +48,7 @@ Pypbbot：一个高效、跨平台、可扩展的<a href="https://github.com/PHI
 
 插件开发时建议启动热重载。其余选项同普通用户，见上。
 
-`pypbbot --reload`
+如：`pypbbot run --port=8123 --reload`
 
 # 里程碑
 
