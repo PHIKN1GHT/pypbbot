@@ -17,7 +17,6 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/PHIKN1GHT/pypbbot",
-    package_dir={'': '.'},
     packages=setuptools.find_packages(include="pypbbot"),
     classifiers=[
         "Programming Language :: Python :: 3",
