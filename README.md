@@ -16,11 +16,35 @@ Pypbbot：一个高效、跨平台、可扩展的<a href="https://github.com/PHI
 
 首先，运行 `pip install --upgrade pypbbot` 以安装本项目或更新至最新版本。
 
-接着，按照文档内容编写机器人程序后，直接运行即可。
+## 普通用户
+
+在工作目录内（一般是`plugins`文件夹所在的目录）执行`pypbbot`即可启动插件服务器。
+
+```cmd
+使用方法: pypbbot [选项]
+
+选项列表:
+  --host TEXT             服务器地址  [默认值: localhost]
+  --port INTEGER          服务器端口  [默认值: 8080]
+  --plugin_path TEXT      插件文件夹  [默认值: plugins]
+  --reload / --no-reload  是否启用热重载（插件更新时立刻重启服务，建议仅调试时启用）  [默认值: no-reload]
+```
+
+## 插件开发者
+
+### 类驱动模式
+
+如果仅需要编写一些简单的逻辑，可直接导入该库，按照文档内容编写机器人程序后直接运行即可。
 
 样例程序源代码： [simple_class_driver.py](https://github.com/PHIKN1GHT/pypbbot/blob/main/pypbbot_examples/simple_class_driver.py)
 
-可在项目根目录下使用 `python -m pypbbot_examples.simple_class_driver` 执行
+（可在项目根目录下使用 `python -m pypbbot_examples.simple_class_driver` 执行）
+
+### 插件驱动模式
+
+插件开发时建议启动热重载。其余选项同普通用户，见上。
+
+`pypbbot --reload`
 
 # 里程碑
 
@@ -28,4 +52,5 @@ Pypbbot：一个高效、跨平台、可扩展的<a href="https://github.com/PHI
 - [x] 测试组件
 - [x] 插件化
 - [x] 事务处理
-- [ ] 命令行工具
+- [x] 命令行工具：服务启动
+- [ ] 命令行工具：插件安装
