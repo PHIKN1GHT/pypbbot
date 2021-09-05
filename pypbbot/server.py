@@ -20,15 +20,15 @@ import uvicorn  # type: ignore
 from fastapi import FastAPI, WebSocket
 from starlette.websockets import WebSocketDisconnect
 
-from pypbbot.driver import BaseDriver
+import pypbbot.driver
+import pypbbot.plugin
 from pypbbot.logging import LOG_CONFIG, logger
-from pypbbot.plugin import load_plugins
 from pypbbot.typing import ProtobufBotFrame as Frame
 from pypbbot.utils import LRULimitedDict, in_lower_case
 
 
 class PyPbBotApp(FastAPI):
-    driver_builder: Optional[Type[BaseDriver]] = None
+    driver_builder: Optional[Type[pypbbot.driver.BaseDriver]] = None
     plugin_path: Optional[str] = None
 
 
@@ -47,7 +47,7 @@ async def init() -> None:
     global loop
     loop = asyncio.get_running_loop()
     if type(app.plugin_path) is str:
-        await load_plugins(app.plugin_path)
+        await pypbbot.plugin.load_plugins(app.plugin_path)
     logger.info('Everything is almost ready. Hello, PyProtobufBot world!')
 
 
@@ -82,7 +82,7 @@ async def handle_websocket(websocket: WebSocket) -> None:
         alive_clients[client_addr] = botId
         driver_builder = app.driver_builder
         if driver_builder is None:
-            driver_builder = BaseDriver
+            driver_builder = pypbbot.driver.BaseDriver
         drivers[botId] = (websocket, driver_builder(botId))
     else:
         _, dri = drivers[botId]
@@ -113,7 +113,7 @@ async def recv_frame(frame: Frame, botId: int) -> None:
     _, driver = drivers[frame.botId]
     if frame_type.endswith('Event'):
         event = getattr(frame, frame.WhichOneof('data'))
-        if isinstance(driver, BaseDriver):
+        if isinstance(driver, pypbbot.driver.BaseDriver):
             asyncio.create_task(driver.handle(event))
     else:
         if frame.echo in resp_cache.keys():
