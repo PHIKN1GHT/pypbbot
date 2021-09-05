@@ -70,6 +70,7 @@ _loadedPlugins: Dict[str, ModuleType] = {}
 
 async def load_plugins(*plugin_dir: str) -> Dict[str, ModuleType]:
     for _dir in plugin_dir:
+        _dir = os.path.abspath(_dir)
         if not os.path.exists(_dir):
             os.makedirs(_dir)
 

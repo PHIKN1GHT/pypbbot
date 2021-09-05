@@ -46,7 +46,12 @@ async def init() -> None:
     """
     global loop
     loop = asyncio.get_running_loop()
+    if os.environ.get("PYPBBOT_PLUGIN_PATH") != None:
+        app.plugin_path = os.environ.get("PYPBBOT_PLUGIN_PATH")
+        # os.environ.unsetenv("PYPBBOT_PLUGIN_PATH")
     if type(app.plugin_path) is str:
+        logger.info("Loading plugins form: [{}]".format(
+            os.path.abspath(app.plugin_path)))
         await pypbbot.plugin.load_plugins(app.plugin_path)
     logger.info('Everything is almost ready. Hello, PyProtobufBot world!')
 
