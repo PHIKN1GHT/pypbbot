@@ -14,7 +14,7 @@ app.driver_builder = AffairDriver
 @click.option("--reload/--no-reload", default=False, show_default=True, help='Whether to enable hot-reload.')
 def serve(host: str, port: int, plugin_path: str, reload: bool) -> None:
     app.plugin_path = plugin_path
-    run_server(app='__main__:app', host=host,
+    run_server(app='pypbbot.serve:app', host=host,
                port=port, reload=reload)  # type: ignore
 
 
