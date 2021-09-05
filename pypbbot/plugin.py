@@ -79,13 +79,16 @@ async def load_plugins(*plugin_dir: str) -> Dict[str, ModuleType]:
                 zippath = os.path.join(_dir, name)
                 sys.path.append(zippath)
                 module_names: set[str] = set()
-                with zipfile.ZipFile(zippath) as zipmodule:
-                    for filename in zipmodule.namelist():
-                        module_name = filename
-                        _pathsep = filename.find("/")
-                        if _pathsep != -1:
-                            module_name = filename[:_pathsep]
-                        module_names.add(module_name)
+                try:
+                    with zipfile.ZipFile(zippath) as zipmodule:
+                        for filename in zipmodule.namelist():
+                            module_name = filename
+                            _pathsep = filename.find("/")
+                            if _pathsep != -1:
+                                module_name = filename[:_pathsep]
+                            module_names.add(module_name)
+                except:
+                    logger.warning("Illegal zip file [{}]. Skipping ...", name)
                 for module_name in module_names:
                     logger.info('Loading module [{}] from [{}] ...'.format(
                         module_name, name))
