@@ -22,12 +22,14 @@ from starlette.websockets import WebSocketDisconnect
 
 from pypbbot.driver import BaseDriver
 from pypbbot.logging import LOG_CONFIG, logger
+from pypbbot.plugin import load_plugins
 from pypbbot.typing import ProtobufBotFrame as Frame
 from pypbbot.utils import LRULimitedDict, in_lower_case
 
 
 class PyPbBotApp(FastAPI):
     driver_builder: Optional[Type[BaseDriver]] = None
+    plugin_path: Optional[str] = None
 
 
 app = PyPbBotApp()
@@ -44,6 +46,8 @@ async def init() -> None:
     """
     global loop
     loop = asyncio.get_running_loop()
+    if type(app.plugin_path) is str:
+        await load_plugins(app.plugin_path)
     logger.info('Everything is almost ready. Hello, PyProtobufBot world!')
 
 
